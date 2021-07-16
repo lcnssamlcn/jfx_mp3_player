@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ColorPicker?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml" fx:id="rootStylingColor" hgap="20" vgap="10" stylesheets="@/css/file/settings_styling_color.css">
+    <children>
+        <Label styleClass="header" text="Color" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <Label styleClass="header" text="Foreground" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <Label styleClass="header" text="Background" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Window" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpAllWindowsFg" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpAllWindowsBg" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song title" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongTitleFg" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongTitleBg" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song artist" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongArtistFg" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongArtistBg" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song album" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongAlbumFg" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongAlbumBg" GridPane.columnIndex="2" GridPane.rowIndex="4" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song Metadata" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongMetadataBg" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song Current Time" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongCurrentTimeFg" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongCurrentTimeBg" GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+
+        <Label text="Song Total Time" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongTotalTimeFg" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+        <ColorPicker fx:id="cpSongTotalTimeBg" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.columnSpan="1" GridPane.rowSpan="1" />
+    </children>
+</GridPane>

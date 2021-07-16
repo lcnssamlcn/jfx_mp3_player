@@ -1,0 +1,10 @@
+#rootStylingColor {
+    -fx-padding: 20px;
+
+    -fx-font-family: Arial;
+    -fx-font-size: 14px;
+}
+
+.header {
+    -fx-font-weight: bold;
+}

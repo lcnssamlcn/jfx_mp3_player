@@ -1,0 +1,8 @@
+@font-face {
+    src: url("/font/VCR_OSD_MONO.ttf");
+}
+
+#root {
+    -fx-font-family: "VCR OSD MONO";
+    -fx-font-size: 14px;
+}

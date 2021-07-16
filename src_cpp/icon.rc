@@ -1,0 +1,6 @@
+#ifndef _resources_rc_
+#define _resources_rc_
+
+MAINICON ICON "../img/ico_mp3_player.ico"
+
+#endif

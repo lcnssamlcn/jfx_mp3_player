@@ -1,0 +1,20 @@
+# lib folder
+lib
+# distribution folder
+dist
+# personal backup folder
+misc
+
+# Junk
+.DS_Store
+*.swp
+Thumbs.db
+
+# Package Files
+*.jar
+*.exe
+
+# Compiled class file
+bin
+*.class
+bin_cpp

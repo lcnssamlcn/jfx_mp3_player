@@ -1,0 +1,23 @@
+CXX = g++
+WINDRES = windres
+SRC_DIR = src_cpp
+BIN_DIR = bin_cpp
+SRC = jar_to_exe.cpp
+OBJ = jar_to_exe.o
+VERSION = 1.0
+APPL = mp3_player-$(VERSION).exe
+
+
+$(APPL): $(BIN_DIR)/jar_to_exe.o $(BIN_DIR)/icon.res
+	$(CXX) -o $@ $(BIN_DIR)/jar_to_exe.o $(BIN_DIR)/icon.res
+
+$(BIN_DIR)/icon.res:
+	$(WINDRES) $(SRC_DIR)/icon.rc -O coff -o $@
+
+$(BIN_DIR)/jar_to_exe.o: $(SRC_DIR)/jar_to_exe.cpp
+	$(CXX) -c $(SRC_DIR)/jar_to_exe.cpp -o $@
+
+clean:
+	del $(BIN_DIR)\\*.o
+	del $(BIN_DIR)\\*.res
+	del $(APPL)

@@ -1,0 +1,40 @@
+@font-face {
+    src: url("/font/VCR_OSD_MONO.ttf");
+}
+
+#root {
+    -fx-font-family: "VCR OSD MONO";
+    -fx-font-size: 14px;
+}
+
+#content {
+    -fx-padding: 10px;
+}
+
+#rootVol {
+    -fx-padding: 10px;
+}
+
+#ivBtnPlay {
+    -fx-image: url("/img/btn_play.png");
+}
+
+#ivBtnPause {
+    -fx-image: url("/img/btn_pause.png");
+}
+
+#ivBtnStop {
+    -fx-image: url("/img/btn_stop.png");
+}
+
+#ivBtnRepeat {
+    -fx-image: url("/img/btn_repeat.png");
+}
+
+#ivBtnVolMin {
+    -fx-image: url("/img/btn_vol_min.png");
+}
+
+#ivBtnVolMax {
+    -fx-image: url("/img/btn_vol_max.png");
+}

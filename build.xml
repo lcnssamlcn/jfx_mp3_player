@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Test JavaFX" default="run">
+    <property name="component.name" value="mp3_player" />
+    <property name="component.main-class" value="com.practice.lcn.jfx_mp3_player.MainApp" />
+    <property name="version" value="1.0" />
+    <property name="src.dir" value="src" />
+    <property name="img.dir" value="img" />
+    <property name="font.dir" value="font" />
+    <property name="classes.dir" value="bin" />
+    <property name="dist.dir" value="dist" />
+    <property name="lib.dir" value="lib" />
+    <property name="lib.tika.dir" value="${lib.dir}/tika-1.24.1" />
+    <property name="lib.openjfx-win-x64.dir" value="${lib.dir}/javafx-sdk-11.0.2-win_x64" />
+    <property name="lib.openjfx-osx-x64.dir" value="${lib.dir}/javafx-sdk-11.0.2-osx_x64" />
+
+    <target name="jar">
+        <jar destfile="${dist.dir}/${component.name}-${version}.jar">
+            <fileset dir="${classes.dir}">
+                <include name="**/*.class" />
+            </fileset>
+            <zipfileset dir="${src.dir}/css" prefix="css">
+                <include name="**/*.css" />
+            </zipfileset>
+            <fileset dir=".">
+                <include name="${img.dir}/**/*.png" />
+            </fileset>
+            <fileset dir=".">
+                <include name="${font.dir}/**/*.ttf" />
+            </fileset>
+            <zipfileset dir="${src.dir}/layout" prefix="layout">
+                <include name="**/*.fxml" />
+            </zipfileset>
+            <fileset dir="${src.dir}">
+                <include name="log4j2.xml" />
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="run-win_x64">
+        <java classname="${component.main-class}" fork="true">
+            <jvmarg line="--module-path ${lib.openjfx-win-x64.dir}/lib --add-modules javafx.controls,javafx.fxml" />
+            <classpath>
+                <pathelement location="${dist.dir}/${component.name}-${version}.jar" />
+                <pathelement location="${lib.dir}/log4j-api-2.12.1.jar" />
+                <pathelement location="${lib.dir}/log4j-core-2.12.1.jar" />
+                <fileset dir="${lib.tika.dir}">
+                    <include name="*.jar" />
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run-osx_x64">
+        <java classname="${component.main-class}" fork="true">
+            <jvmarg line="--module-path ${lib.openjfx-osx-x64.dir}/lib --add-modules javafx.controls,javafx.fxml" />
+            <classpath>
+                <pathelement location="${dist.dir}/${component.name}-${version}.jar" />
+                <pathelement location="${lib.dir}/log4j-api-2.12.1.jar" />
+                <pathelement location="${lib.dir}/log4j-core-2.12.1.jar" />
+                <fileset dir="${lib.tika.dir}">
+                    <include name="*.jar" />
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete>
+            <fileset dir="${dist.dir}">
+                <include name="${component.name}-${version}.jar" />
+            </fileset>
+        </delete>
+    </target>
+</project>
