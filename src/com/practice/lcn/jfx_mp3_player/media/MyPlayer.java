@@ -1,12 +1,15 @@
 package com.practice.lcn.jfx_mp3_player.media;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.application.Platform;
+
 import com.practice.lcn.jfx_mp3_player.MainApp;
 import com.practice.lcn.jfx_mp3_player.controller.MyFxmlController;
 import com.practice.lcn.jfx_mp3_player.controller.MainController;
 import com.practice.lcn.jfx_mp3_player.media.effect.Effect;
 import com.practice.lcn.jfx_mp3_player.media.effect.TempoShift;
-
-import javafx.application.Platform;
 
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
@@ -67,7 +70,7 @@ public class MyPlayer {
     /**
      * enable/disable song repeat.
      */
-    private boolean enableRepeat;
+    private volatile boolean enableRepeat;
     /**
      * song tempo
      */
@@ -75,7 +78,11 @@ public class MyPlayer {
     /**
      * song's current play state.
      */
-    private STATE state;
+    private volatile SimpleObjectProperty<STATE> state;
+    /**
+     * indicating whether this music player is ready to replay a song.
+     */
+    private volatile boolean isReady;
     /**
      * number of effect transforms that the song currently applies.
      */
@@ -114,14 +121,28 @@ public class MyPlayer {
      * @param  wavPath   WAV song file location.
      * @throws Exception throws when the song cannot be loaded.
      */
-    public MyPlayer(String wavPath) throws Exception {
+    public MyPlayer(String wavPath, MyFxmlController mfc) throws Exception {
         this.pausedMicrosecPos = 0L;
         this.transformCount = 0;
         this.effects = new ArrayList<Effect>();
         this.tempo = 1;
         this.enableRepeat = false;
-        this.mfc = null;
+        this.mfc = mfc;
+        this.state = new SimpleObjectProperty<STATE>();
+        this.isReady = false;
 
+        this.state.addListener(new ChangeListener<STATE>(){
+            @Override
+            public void changed(ObservableValue<? extends STATE> observable, STATE oldValue, STATE newValue) {
+                logger.debug(String.format("state listener: newValue: \"%s\"", newValue.name()));
+                if (newValue == STATE.RUNNING) {
+                    ((MainController) mfc).initBtnPauseHotkey();
+                }
+                else if (newValue == STATE.PAUSE || newValue == STATE.STOP) {
+                    ((MainController) mfc).initBtnPlayHotkey();
+                }
+            }
+        });
         this.loadSong(wavPath);
     }
 
@@ -129,10 +150,10 @@ public class MyPlayer {
      * start playing the song from the start.
      */
     public void start() {
-        if (this.state == STATE.STOP) {
+        if (this.state.get() == STATE.STOP) {
             this.clip.setMicrosecondPosition(0L);
             this.clip.start();
-            this.state = STATE.RUNNING;
+            this.state.set(STATE.RUNNING);
         }
     }
 
@@ -140,10 +161,10 @@ public class MyPlayer {
      * stop the song from playing and move the seek position to the start.
      */
     public void stop() {
-        if (this.state == STATE.RUNNING || this.state == STATE.PAUSE) {
+        if (this.state.get() == STATE.RUNNING || this.state.get() == STATE.PAUSE) {
             this.clip.stop();
             this.pausedMicrosecPos = 0L;
-            this.state = STATE.STOP;
+            this.state.set(STATE.STOP);
         }
     }
 
@@ -151,10 +172,10 @@ public class MyPlayer {
      * pause the song temporarily. The song can be resumed later.
      */
     public void pause() {
-        if (this.state == STATE.RUNNING) {
+        if (this.state.get() == STATE.RUNNING) {
             this.pausedMicrosecPos = this.clip.getMicrosecondPosition();
             this.clip.stop();
-            this.state = STATE.PAUSE;
+            this.state.set(STATE.PAUSE);
         }
     }
 
@@ -162,7 +183,7 @@ public class MyPlayer {
      * resume the song from the paused frame position.
      */
     public void resume() {
-        if (this.state == STATE.PAUSE) {
+        if (this.state.get() == STATE.PAUSE) {
             if (this.pausedMicrosecPos < this.clip.getMicrosecondLength()) {
                 this.clip.setMicrosecondPosition(this.pausedMicrosecPos);
             }
@@ -170,7 +191,7 @@ public class MyPlayer {
                 this.clip.setMicrosecondPosition(0L);
             }
             this.clip.start();
-            this.state = STATE.RUNNING;
+            this.state.set(STATE.RUNNING);
         }
     }
 
@@ -181,7 +202,7 @@ public class MyPlayer {
      */
     public void seek(int secPos) {
         long microsecPos = Math.round(secPos * Math.pow(10, 6));
-        if (this.state == STATE.STOP || this.state == STATE.PAUSE) {
+        if (this.state.get() == STATE.STOP || this.state.get() == STATE.PAUSE) {
             this.pausedMicrosecPos = microsecPos;
         }
     }
@@ -230,7 +251,7 @@ public class MyPlayer {
     }
 
     public void setState(STATE state) {
-        this.state = state;
+        this.state.set(state);
     }
 
     public void setEnableRepeat(boolean enableRepeat) {
@@ -254,7 +275,7 @@ public class MyPlayer {
     }
 
     public STATE getState() {
-        return this.state;
+        return this.state.get();
     }
 
     /**
@@ -291,7 +312,7 @@ public class MyPlayer {
     /**
      * remove all effect-transformed song files.
      */
-    public void freeEffects() {
+    public static void freeEffects() {
         File processingDir = new File(MainApp.APPL_DATA_DIR + File.separatorChar + MainApp.PROCESSING_DIR);
         File[] processingDirFiles = processingDir.listFiles();
         for (File f : processingDirFiles) {
@@ -302,13 +323,14 @@ public class MyPlayer {
     }
 
     /**
-     * remove the original WAV song {@link com.practice.lcn.jfx_mp3_player.media.MyPlayer#BASE_WAV}.
+     * remove the original songs {@link com.practice.lcn.jfx_mp3_player.media.MyPlayer#BASE_WAV} and {@link com.practice.lcn.jfx_mp3_player.media.MyPlayer#BASE_MP3}.
      */
-    public void freeSong() {
+    public static void freeSong() {
         File processingDir = new File(MainApp.APPL_DATA_DIR + File.separatorChar + MainApp.PROCESSING_DIR);
         File[] processingDirFiles = processingDir.listFiles();
         for (File f : processingDirFiles) {
             if (f.getName().equals(MyPlayer.BASE_WAV) || f.getName().equals(MyPlayer.BASE_MP3)) {
+                logger.debug(String.format("freeSong(): f.getName(): \"%s\"", f.getName()));
                 f.delete();
             }
         }
@@ -319,9 +341,9 @@ public class MyPlayer {
      */
     public void close() {
         this.freeClip();
-        this.freeEffects();
-        this.freeSong();
-        this.state = STATE.STOP;
+        MyPlayer.freeEffects();
+        MyPlayer.freeSong();
+        this.state.set(STATE.STOP);
     }
 
     /**
@@ -348,23 +370,27 @@ public class MyPlayer {
                 if (event.getType().equals(LineEvent.Type.STOP)) {
                     if (clip.getMicrosecondPosition() >= clip.getMicrosecondLength()) {
                         logger.debug("media has finished playing.");
-                        state = STATE.STOP;
+                        state.set(STATE.STOP);
+                        clip.stop();
+                        logger.debug(String.format("loadSong(): linelistener: enableRepeat: %b", enableRepeat));
                         if (enableRepeat) {
+                            isReady = false;
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    ((MainController) mfc).updateSeekbar(0);
+                                    ((MainController) mfc).fireBtnStopClick();
+                                    isReady = true;
                                 }
                             });
-                            start();
-                            ((MainController) mfc).restartTSeekBarUpdate();
+                            while (!isReady);
+                            ((MainController) mfc).fireBtnPlayClick();
                         }
                     }
                 }
             }
         });
 
-        this.state = STATE.STOP;
+        this.state.set(STATE.STOP);
     }
 
     /**
@@ -373,7 +399,7 @@ public class MyPlayer {
      * @throws Exception throws when an effect cannot be applied on the song.
      */
     private String applyEffects() throws Exception {
-        this.freeEffects();
+        MyPlayer.freeEffects();
         this.transformCount = 0;
 
         File fBaseWav = new File(MainApp.APPL_DATA_DIR + File.separatorChar + MainApp.PROCESSING_DIR + File.separatorChar + MyPlayer.BASE_WAV);

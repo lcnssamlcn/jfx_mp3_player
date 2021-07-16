@@ -9,6 +9,10 @@ This project attempts to create a mp3 music player using JavaFX.
 - able to apply effects on mp3
     - tempo shift
 
+## Hotkey
+
+`P`: resume/pause the song
+
 ## Caution
 
 - mp3 will remain unchanged after applying any effect.
@@ -223,3 +227,8 @@ Mac OS X
 ## License
 
 This application is under GPL v3.0 license. Feel free to modify and add more features to the application. If you use this application for production, please credit my work. Thanks.
+
+Moreover, thanks to the following people that contributes my application:
+
+- Riciery Leal: "${PROJECT_DIR}/font/VCR_OSD_MONO.ttf"
+https://www.dafont.com/vcr-osd-mono.font

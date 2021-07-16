@@ -28,6 +28,8 @@ import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.application.Platform;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCode;
 
 import java.net.URL;
 
@@ -224,6 +226,15 @@ public class MainController implements Initializable, MyFxmlController {
     private String labelSongTotalTimeBgColor;
 
     /**
+     * keyboard shortcut to fire {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnPause}.
+     */
+    private static final KeyCodeCombination BTN_PAUSE_HOTKEY = new KeyCodeCombination(KeyCode.P);
+    /**
+     * keyboard shortcut to fire {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnPlay}.
+     */
+    private static final KeyCodeCombination BTN_PLAY_HOTKEY = BTN_PAUSE_HOTKEY;
+
+    /**
      * application config
      */
     private Config conf;
@@ -386,14 +397,17 @@ public class MainController implements Initializable, MyFxmlController {
                 if (this.mp != null) {
                     this.mp.close();
                 }
+                else {
+                    MyPlayer.freeEffects();
+                    MyPlayer.freeSong();
+                }
                 this.mkProcessingDir();
                 File fBaseMp3 = new File(MainApp.APPL_DATA_DIR + File.separatorChar + MainApp.PROCESSING_DIR + File.separatorChar + MyPlayer.BASE_MP3);
                 Files.copy(f.toPath(), fBaseMp3.toPath());
                 File fWav = new File(MainApp.APPL_DATA_DIR + File.separatorChar + MainApp.PROCESSING_DIR + File.separatorChar + MyPlayer.BASE_WAV);
                 logger.debug(String.format("handleMiFileOpenClick(): f.getAbsolutePath(): \"%s\"", f.getAbsolutePath()));
                 AudioFormatConverter.mp3ToWav(fBaseMp3.getAbsolutePath(), fWav.getAbsolutePath());
-                this.mp = new MyPlayer(fWav.getAbsolutePath());
-                this.mp.setMfc(this);
+                this.mp = new MyPlayer(fWav.getAbsolutePath(), this);
                 this.miEffectsChangeTempo.setDisable(false);
                 if (this.conf != null) {
                     if (this.conf.getTempo() != null) {
@@ -878,6 +892,10 @@ public class MainController implements Initializable, MyFxmlController {
         this.updateLabelSongTotalTimeBg();
     }
 
+    public boolean isTSeekbarUpdateStarted() {
+        return this.tSeekbarUpdate != null && this.tSeekbarUpdate.isAlive();
+    }
+
     public String getAllWindowsFgColor() {
         return this.allWindowsFgColor;
     }
@@ -1000,6 +1018,10 @@ public class MainController implements Initializable, MyFxmlController {
         this.closeHelpAboutWindow();
         if (this.mp != null) {
             this.mp.close();
+        }
+        else {
+            MyPlayer.freeEffects();
+            MyPlayer.freeSong();
         }
         try {
             this.saveSettings();
@@ -1125,6 +1147,52 @@ public class MainController implements Initializable, MyFxmlController {
         this.seekbar.setMax(songTotalTime);
 
         this.updateSeekbar(0);
+    }
+
+    /**
+     * register keyboard shortcut of {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnPause}.
+     */
+    public void initBtnPauseHotkey() {
+        Scene scene = this.mainWindow.getScene();
+        scene.getAccelerators().put(
+            MainController.BTN_PAUSE_HOTKEY,
+            new Runnable() {
+                @FXML
+                public void run() {
+                    btnPause.fire();
+                }
+            }
+        );
+    }
+
+    /**
+     * register keyboard shortcut of {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnPlay}.
+     */
+    public void initBtnPlayHotkey() {
+        Scene scene = this.mainWindow.getScene();
+        scene.getAccelerators().put(
+            MainController.BTN_PLAY_HOTKEY,
+            new Runnable() {
+                @FXML
+                public void run() {
+                    btnPlay.fire();
+                }
+            }
+        );
+    }
+
+    /**
+     * manually fire {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnPlay} click event.
+     */
+    public void fireBtnPlayClick() {
+        this.btnPlay.fire();
+    }
+
+    /**
+     * manually fire {@link com.practice.lcn.jfx_mp3_player.controller.MainController#btnStop} click event.
+     */
+    public void fireBtnStopClick() {
+        this.btnStop.fire();
     }
 
     /**
